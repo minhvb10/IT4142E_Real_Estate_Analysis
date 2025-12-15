@@ -1,0 +1,135 @@
+import streamlit as st
+import json 
+
+house_type_ls = ['Main street house', 'Villa', 'Alley house', 'Townhouse']
+legal_ls = [
+        "Full legal ownership",
+        "Purchase contract",
+        "Pending legal paperwork",
+        "Shared ownership",
+        "Deposit agreement",
+        "Handwritten document",
+        "Other legal documents",
+        "No ownership document",
+        "Undefined or unclear legal status"
+    ]
+
+with open('vn_available_locations.json', 'r', encoding='utf-8') as f:
+        lct_hierachy = json.load(f)
+    
+province_list = list(lct_hierachy.keys()) 
+    
+def display():
+    # Province 
+    st.subheader('Provinces/City')
+    select_city = st.selectbox('Choose the province/city:', province_list, index = None, placeholder='Select a province/city')
+
+    # District
+    st.subheader('District')
+    if select_city:
+        dist_hierachy = lct_hierachy[select_city]
+        district_list = list(dist_hierachy.keys())
+    else:
+        district_list = []
+    select_district = st.selectbox('Choose the district', district_list, index = None, placeholder='Select a district')
+
+    # Ward
+    st.subheader('Ward')
+    if select_district:
+        ward_hierachy = dist_hierachy[select_district]
+        ward_list = list(ward_hierachy.keys())
+    else:
+        ward_list = []
+    select_ward = st.selectbox('Choose the ward', ward_list, index = None, placeholder='Select a ward')
+
+    # Street
+    st.subheader('Street')
+    if select_ward:
+        street_list = ward_hierachy[select_ward]
+    else:
+        street_list = []
+    select_street = st.selectbox('Choose the ward', street_list, index = None, placeholder='Select a street')
+
+    # house type
+    st.subheader('House type')
+    house_type = st.selectbox('Choose the house type', house_type_ls, index = None, placeholder='Select a house type')
+
+    # Size
+    st.subheader('Size')
+    size = st.number_input('Fill in the house size in m^2', min_value = 0, format = '%d')
+
+    # Floors
+    st.subheader('Floors')
+    floors = st.select_slider("Number of Floors", options = list(range(1, 11)) + ["10+"], value = 1)
+
+    # Bedrooms
+    st.subheader('Bedrooms')
+    bedrooms = st.select_slider("Number of Bedrooms", options = list(range(1, 11)) + ["10+"], value = 1)
+
+    # toilets
+    st.subheader('Toilets')
+    toilets = st.select_slider("Number of Toilets", options = list(range(1, 11)) + ["10+"], value = 1)
+
+    # legal docs
+    st.subheader('Legal documents')
+    legal = st.selectbox('Choose the type of available document for the house', legal_ls, index = None, placeholder = 'Select a legal status of the house')
+
+    st.write('\n\n\n\n\n\n')
+
+    all_filled = all([
+        select_city, 
+        select_district, 
+        select_ward, 
+        select_street, 
+        house_type, 
+        legal
+    ]) and (size > 0)
+
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        submit = st.button('Predict house price', use_container_width=True, disabled=not all_filled)
+
+    if submit:
+        house_info = {
+            "city": select_city,
+            "district": select_district,
+            "ward": select_ward,
+            "street": select_street,
+            "house_type": house_type,
+            "size": size,
+            "floors": floors,
+            "bedrooms": bedrooms,
+            "toilets": toilets,
+            "legal": legal
+        }
+        st.balloons()
+        
+        predicted_price = 0.0
+        result_sidebar(house_info, predicted_price)
+        price_dialog(predicted_price)
+
+def result_sidebar(house_info, predicted_price):
+    with st.sidebar:
+        st.title('Result Summary:')
+        st.subheader(f'Estimated Price:\n {predicted_price:,.0f} VND')
+        st.write('\n\n\n\n\n\n\n\n')
+        st.subheader('House details:\n\n')
+        for key, value in house_info.items():
+            st.write(f"{key}: {value}")
+
+@st.dialog("Prediction result")
+def price_dialog(price):
+    st.success(f'## Estimated Price: {price:,.0f} VND')
+    st.info('Checkout the sidebar for further details.')
+    
+    
+
+def main():
+    display()
+    
+if __name__ == "__main__":
+    main()
+    
+
+
+
