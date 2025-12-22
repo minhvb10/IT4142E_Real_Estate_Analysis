@@ -1,5 +1,8 @@
 import streamlit as st
 import json 
+from preprocess import DataProcessor
+import pandas as pd
+import pickle
 
 house_type_ls = ['Main street house', 'Villa', 'Alley house', 'Townhouse']
 legal_ls = [
@@ -91,20 +94,21 @@ def display():
 
     if submit:
         house_info = {
-            "city": select_city,
-            "district": select_district,
-            "ward": select_ward,
             "street": select_street,
-            "house_type": house_type,
+            "ward": select_ward,
+            "district": select_district,
+            "city": select_city,
             "size": size,
-            "floors": floors,
-            "bedrooms": bedrooms,
+            "property_legal_document": legal,
+            "bed_rooms": bedrooms,
             "toilets": toilets,
-            "legal": legal
+            "floors": floors,
+            "house_type": house_type
         }
+        house_input = pd.DataFrame({k: [v] for k, v in house_info.items()})
+        predicted_price = predict(house_input)
         st.balloons()
         
-        predicted_price = 0.0
         result_sidebar(house_info, predicted_price)
         price_dialog(predicted_price)
 
@@ -122,6 +126,15 @@ def price_dialog(price):
     st.success(f'## Estimated Price: {price:,.0f} VND')
     st.info('Checkout the sidebar for further details.')
     
+def predict(X):
+    model_path = 'saved_models/ridge.pkl'
+    processor_path = 'saved_models/processor.pkl'
+    with open(processor_path, 'rb') as f:
+        processor = pickle.load(f)
+    scaled_X = processor.transform(X)
+    with open(model_path, 'rb') as f:
+        model = pickle.load(f)
+    return model.predict(scaled_X)[0]*1e9
     
 
 def main():
