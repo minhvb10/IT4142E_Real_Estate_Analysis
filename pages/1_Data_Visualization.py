@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 
-df = pd.read_csv('df_clean.csv')
+df = pd.read_csv('saved_data/df_clean.csv')
 
 house_type_mapping = {
     1: 'Main Street House',
@@ -31,20 +31,8 @@ def house_by_city():
 
 
 def house_by_type():
-    local_df = df.copy()
-    # Ensure 'house_ty' column is numeric and integer, errors will become NaN
-    local_df['house_ty'] = pd.to_numeric(local_df['house_ty'], errors='coerce')
-    
-    # Drop rows where 'house_ty' is NaN after conversion
-    local_df.dropna(subset=['house_ty'], inplace=True)
-    
-    # Convert to integer
-    local_df['house_ty'] = local_df['house_ty'].astype(int)
-
-    type_counts = local_df['house_ty'].value_counts()
-    
-    # Map numerical house_ty to descriptive labels safely
-    type_labels = type_counts.index.map(lambda x: house_type_mapping.get(x, f'Unknown Type ({x})'))
+    type_counts = df['house_type'].value_counts()
+    type_labels = type_counts.index.map(lambda x: house_type_mapping.get(x, x))
     
     plt.figure(figsize=(10, 6))
     sns.barplot(x=type_labels, y=type_counts.values, color = 'lightcoral')
