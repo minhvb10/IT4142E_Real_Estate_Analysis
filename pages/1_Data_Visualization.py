@@ -6,27 +6,36 @@ import numpy as np
 
 df = pd.read_csv('df_clean.csv')
 
+house_type_mapping = {
+    1: 'Main Street House',
+    2: 'Villa',
+    3: 'Alley House',
+    4: 'Townhouse',
+}
+
 def house_by_city():
     city_counts = df['city'].value_counts()
     top_3_cities = city_counts.head(3)
     other_cities_count = city_counts.iloc[3:].sum()
     if other_cities_count > 0:
-        plot_data = pd.concat([top_3_cities, pd.Series({'Others': other_cities_count})])
+        plot_data = pd.concat([top_3_cities, pd.Series([other_cities_count], index=['Others'])])
     else:
         plot_data = top_3_cities
         
     plt.figure(figsize=(10, 8))
-    plt.pie(plot_data, labels=plot_data.index, autopct='%1.1f%%', startangle=180, colors=['navy', 'steelblue', 'skyblue', 'lightgray']
-, textprops={'color': 'white'})
-    plt.title('Distribution of Houses by City (Top 3 + Others)')
+    plt.pie(plot_data, labels=plot_data.index, autopct='%1.1f%%', startangle=180, colors=['navy', 'steelblue', 'skyblue', 'lightgray'], textprops={'color': 'white'})
+    plt.title('Distribution of Houses by City')
     plt.axis('equal')  
+    plt.legend(plot_data.index, title="Cities", loc="center left", bbox_to_anchor=(1, 0, 0.5, 1))
     return plt
 
 
 def house_by_type():
     type_counts = df['house_type'].value_counts()
+    type_labels = type_counts.index.map(lambda x: house_type_mapping.get(x, x))
+    
     plt.figure(figsize=(10, 6))
-    sns.barplot(x=type_counts.index, y=type_counts.values, color = 'lightcoral')
+    sns.barplot(x=type_labels, y=type_counts.values, color = 'lightcoral')
     plt.title('Distribution of Houses by Type')
     plt.xlabel('House Type')
     plt.ylabel('Number of Houses')
