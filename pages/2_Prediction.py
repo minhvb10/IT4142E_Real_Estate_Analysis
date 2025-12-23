@@ -1,6 +1,6 @@
 import streamlit as st
 import json 
-from preprocess import DataProcessor
+from preprocessing.preprocess import DataProcessor
 import pandas as pd
 import pickle
 
@@ -17,7 +17,7 @@ legal_ls = [
         "Undefined or unclear legal status"
     ]
 
-with open('vn_available_locations.json', 'r', encoding='utf-8') as f:
+with open('saved_data/vn_available_locations.json', 'r', encoding='utf-8') as f:
         lct_hierachy = json.load(f)
     
 province_list = list(lct_hierachy.keys()) 
@@ -127,7 +127,7 @@ def price_dialog(price):
     st.info('Checkout the sidebar for further details.')
     
 def predict(X):
-    model_path = 'saved_models/ridge.pkl'
+    model_path = 'saved_models/random_forest_model.pkl'
     processor_path = 'saved_models/processor.pkl'
     with open(processor_path, 'rb') as f:
         processor = pickle.load(f)
