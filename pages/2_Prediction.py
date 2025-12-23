@@ -1,8 +1,8 @@
 import streamlit as st
 import json 
-from preprocessing.preprocess import DataProcessor
 import pandas as pd
 import pickle
+from preprocess import DataProcessor
 
 house_type_ls = ['Main street house', 'Villa', 'Alley house', 'Townhouse']
 legal_ls = [
