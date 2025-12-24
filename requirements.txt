@@ -1,0 +1,15 @@
+beautifulsoup4
+duckdb
+fake_useragent
+matplotlib
+numpy
+pandas
+PyYAML
+requests
+scikit-learn
+seaborn
+selenium
+streamlit
+tenacity
+undetected-chromedriver
+xgboost

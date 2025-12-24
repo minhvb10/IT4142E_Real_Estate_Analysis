@@ -1,0 +1,13 @@
+task distribution
+Vu Binh Minh: Crawl data from mogi.vn
+Preprocess data
+Train RandomForest
+
+Bui Dang Quy:Crawl data from onehousing.vn 
+EDA
+Train XGBoost
+
+Ngo Minh Trung: Crawl data from nhatot.com
+Standardize and split the data
+Build web 
+Train Ridge Regression

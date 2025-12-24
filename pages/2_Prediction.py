@@ -3,6 +3,9 @@ import json
 import pandas as pd
 import pickle
 from preprocess import DataProcessor
+import os
+import zipfile
+
 
 house_type_ls = ['Main street house', 'Villa', 'Alley house', 'Townhouse']
 legal_ls = [
@@ -16,6 +19,8 @@ legal_ls = [
         "No ownership document",
         "Undefined or unclear legal status"
     ]
+ZIP_PATH = 'saved_models/random_forest_model.zip'
+PKL_PATH = 'saved_models/random_forest_model.pkl'
 
 with open('saved_data/vn_available_locations.json', 'r', encoding='utf-8') as f:
         lct_hierachy = json.load(f)
@@ -132,10 +137,24 @@ def predict(X):
     with open(processor_path, 'rb') as f:
         processor = pickle.load(f)
     scaled_X = processor.transform(X)
+    
+    # since the rf model > 100MB so we cannot push it to github as pkl file
+    if model_path == 'saved_models/random_forest_model.pkl':
+        model = load_rf_model()
+        return model.predict(scaled_X)[0]*1e9
+    
     with open(model_path, 'rb') as f:
         model = pickle.load(f)
     return model.predict(scaled_X)[0]*1e9
-    
+
+def load_rf_model():
+    if not os.path.exists(PKL_PATH):
+        with zipfile.ZipFile(ZIP_PATH, 'r') as zip_rf:
+            zip_rf.extractall('saved_models')
+
+    with open(PKL_PATH, "rb") as f:
+        model = pickle.load(f)
+    return model
 
 def main():
     display()
